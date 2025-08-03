@@ -106,79 +106,86 @@ export default function NewsChannel() {
 
   return (
     <div
-      className="w-full max-w-3xl bg-gray-800 p-6 rounded-lg shadow-lg"
+      className="relative w-screen h-screen overflow-hidden"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
+      {/* Background Image - covers entire viewport */}
       {currentNews.image.url && (
         <Image
           src={currentNews.image.url}
           alt={currentNews.title}
-          width={currentNews.image.width}
-          height={currentNews.image.height}
-          className="w-full h-96 object-cover mb-4 rounded"
+          fill
+          className="object-cover"
+          priority
         />
       )}
-      <h2 className="text-2xl font-semibold mb-4 text-white">
-        {currentNews.title}
-      </h2>
-      <p className="text-gray-300 mb-2">
-        Published: {new Date(currentNews.pubDate).toLocaleString()}
-      </p>
-      <a
-        href={currentNews.link}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-blue-400 hover:underline"
-      >
-        Read more
-      </a>
 
-      {/* Navigation buttons */}
-      <div className="flex justify-between items-center mt-6">
-        <button
-          onClick={goToPrevious}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2"
-        >
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+      {/* Content overlay - bottom of screen */}
+      <div className="absolute bottom-0 left-0 right-0 z-10 p-6">
+        <div className="bg-black bg-opacity-30 backdrop-blur-sm rounded-lg p-6">
+          <h2 className="text-2xl font-semibold mb-4 text-white">
+            {currentNews.title}
+          </h2>
+          <p className="text-gray-200 mb-2">
+            Published: {new Date(currentNews.pubDate).toLocaleString()}
+          </p>
+          <a
+            href={currentNews.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-300 hover:text-blue-100 hover:underline"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-          Previous
-        </button>
+            Read more
+          </a>
 
-        <span className="text-gray-300 text-sm">
-          {currentIndex + 1} of {news.length}
-        </span>
+          {/* Navigation buttons */}
+          <div className="flex justify-between items-center mt-6">
+            <button
+              onClick={goToPrevious}
+              className="bg-blue-600 bg-opacity-80 hover:bg-opacity-100 text-white px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 backdrop-blur-sm"
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+              Previous
+            </button>
 
-        <button
-          onClick={goToNext}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2"
-        >
-          Next
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
-        </button>
+            <span className="text-white text-sm bg-black bg-opacity-30 px-3 py-1 rounded backdrop-blur-sm">
+              {currentIndex + 1} of {news.length}
+            </span>
+
+            <button
+              onClick={goToNext}
+              className="bg-blue-600 bg-opacity-80 hover:bg-opacity-100 text-white px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 backdrop-blur-sm"
+            >
+              Next
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
