@@ -18,7 +18,10 @@ interface NewsItem {
 export default function NewsChannel() {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const startTimeRef = useRef<number>(0);
+  const remainingTimeRef = useRef<number>(5000);
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -34,45 +37,66 @@ export default function NewsChannel() {
     return () => clearInterval(interval);
   }, []);
 
-  // Function to start/reset the timer
-  const startTimer = useCallback(() => {
-    // Clear existing timer
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
+  // Timer effect - handles starting, pausing, and resuming
+  useEffect(() => {
+    if (news.length === 0) return;
+
+    if (!isHovered) {
+      // Start or resume timer
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+
+      startTimeRef.current = Date.now();
+      timerRef.current = setTimeout(() => {
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % news.length);
+        remainingTimeRef.current = 5000; // Reset for next slide
+      }, remainingTimeRef.current);
+    } else {
+      // Pause timer
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+
+        // Calculate remaining time
+        const elapsed = Date.now() - startTimeRef.current;
+        remainingTimeRef.current = Math.max(
+          0,
+          remainingTimeRef.current - elapsed
+        );
+      }
     }
 
-    // Start new timer
-    timerRef.current = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % news.length);
-    }, 5000);
-  }, [news.length]);
+    // Cleanup on unmount
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, [news.length, isHovered, currentIndex]);
+
+  // Handle mouse enter (pause timer)
+  const handleMouseEnter = useCallback(() => {
+    setIsHovered(true);
+  }, []);
+
+  // Handle mouse leave (resume timer)
+  const handleMouseLeave = useCallback(() => {
+    setIsHovered(false);
+  }, []);
 
   // Manual navigation functions
   const goToPrevious = useCallback(() => {
     setCurrentIndex((prevIndex) =>
       prevIndex === 0 ? news.length - 1 : prevIndex - 1
     );
-    startTimer(); // Reset timer
-  }, [news.length, startTimer]);
+    remainingTimeRef.current = 5000; // Reset remaining time
+  }, [news.length]);
 
   const goToNext = useCallback(() => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % news.length);
-    startTimer(); // Reset timer
-  }, [news.length, startTimer]);
-
-  // Start timer when news changes
-  useEffect(() => {
-    if (news.length > 0) {
-      startTimer();
-    }
-
-    // Cleanup timer on unmount
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    };
-  }, [news, startTimer]);
+    remainingTimeRef.current = 5000; // Reset remaining time
+  }, [news.length]);
 
   if (news.length === 0) {
     return <div>Loading news...</div>;
@@ -81,7 +105,11 @@ export default function NewsChannel() {
   const currentNews = news[currentIndex];
 
   return (
-    <div className="w-full max-w-3xl bg-gray-800 p-6 rounded-lg shadow-lg">
+    <div
+      className="w-full max-w-3xl bg-gray-800 p-6 rounded-lg shadow-lg"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       {currentNews.image.url && (
         <Image
           src={currentNews.image.url}
