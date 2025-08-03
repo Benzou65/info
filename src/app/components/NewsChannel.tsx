@@ -9,10 +9,40 @@ interface NewsItem {
   pubDate: string;
   image: {
     url: string;
+    rssUrl: string;
     medium: string;
     width: number;
     height: number;
   };
+}
+
+// Custom Image component with fallback handling
+function ImageWithFallback({
+  src,
+  fallbackSrc,
+  alt,
+  ...props
+}: {
+  src: string;
+  fallbackSrc?: string;
+  alt: string;
+} & React.ComponentProps<typeof Image>) {
+  const [imgSrc, setImgSrc] = useState(src);
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    setImgSrc(src);
+    setHasError(false);
+  }, [src]);
+
+  const handleError = () => {
+    if (!hasError && fallbackSrc) {
+      setImgSrc(fallbackSrc);
+      setHasError(true);
+    }
+  };
+
+  return <Image {...props} src={imgSrc} alt={alt} onError={handleError} />;
 }
 
 export default function NewsChannel() {
@@ -105,11 +135,18 @@ export default function NewsChannel() {
   const currentNews = news[currentIndex];
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden">
+    <div
+      className="relative w-screen h-screen overflow-hidden"
+      onClick={() => {
+        console.log("currentNews.image.url", currentNews.image.url);
+        console.log("currentNews.image.rssUrl", currentNews.image.rssUrl);
+      }}
+    >
       {/* Background Image - covers entire viewport */}
       {currentNews.image.url && (
-        <Image
+        <ImageWithFallback
           src={currentNews.image.url}
+          fallbackSrc={currentNews.image.rssUrl}
           alt={currentNews.title}
           fill
           className="object-cover"
