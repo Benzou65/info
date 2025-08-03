@@ -105,11 +105,7 @@ export default function NewsChannel() {
   const currentNews = news[currentIndex];
 
   return (
-    <div
-      className="relative w-screen h-screen overflow-hidden"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
+    <div className="relative w-screen h-screen overflow-hidden">
       {/* Background Image - covers entire viewport */}
       {currentNews.image.url && (
         <Image
@@ -122,7 +118,11 @@ export default function NewsChannel() {
       )}
 
       {/* Content overlay - bottom of screen */}
-      <div className="absolute bottom-0 left-0 right-0 z-10 p-6">
+      <div
+        className="absolute bottom-0 left-0 right-0 z-10 p-6"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
         <div className="bg-black bg-opacity-30 backdrop-blur-sm rounded-lg p-6">
           <h2 className="text-2xl font-semibold mb-4 text-white">
             {currentNews.title}

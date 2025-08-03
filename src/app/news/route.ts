@@ -26,39 +26,39 @@ const parser: Parser<CustomFeed> = new Parser({
   },
 });
 
+const reshapeFeed = (feed: CustomFeed) => {
+  return {
+    ...feed,
+    items: feed.items.map((item) => ({
+      ...item,
+      image: {
+        url: item.imageUrl?.$?.url ?? null,
+        medium: item.imageUrl?.$?.medium ?? null,
+        width: item.imageUrl?.$?.width ?? null,
+        height: item.imageUrl?.$?.height ?? null,
+      },
+    })),
+  };
+};
+
 export async function GET() {
   try {
     const feed = await parser.parseURL(
       "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
     );
 
-    const reshapeFeed = (feed: CustomFeed) => {
-      return {
-        ...feed,
-        items: feed.items.map((item) => ({
-          ...item,
-          image: {
-            url: item.imageUrl?.$?.url ?? null,
-            medium: item.imageUrl?.$?.medium ?? null,
-            width: item.imageUrl?.$?.width ?? null,
-            height: item.imageUrl?.$?.height ?? null,
-          },
-        })),
-      };
-    };
-
     const reshapedFeed = reshapeFeed(feed);
-
-    try {
-      console.log(reshapedFeed);
-    } catch (error) {
-      console.log(error);
-    }
 
     return NextResponse.json(reshapedFeed);
   } catch (error) {
+    if (error instanceof Error) {
+      return NextResponse.json(
+        { message: error.message, error: error },
+        { status: 500 }
+      );
+    }
     return NextResponse.json(
-      { error: "Failed to fetch news" },
+      { message: "An unknown error occurred", error: error },
       { status: 500 }
     );
   }
