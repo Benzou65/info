@@ -129,7 +129,13 @@ const reshapeFeed = (feed: CustomFeed) => {
         creator: item.creator || item.author || null,
         imageCredit: item.imageCredit || null,
       }))
-      .filter((item) => item.image.rssUrl !== null),
+      .filter((item) => item.image.rssUrl !== null)
+      .sort((a, b) => {
+        // Sort by pubDate in descending order (newest first)
+        const dateA = a.pubDate ? new Date(a.pubDate).getTime() : 0;
+        const dateB = b.pubDate ? new Date(b.pubDate).getTime() : 0;
+        return dateB - dateA;
+      }),
   };
 };
 

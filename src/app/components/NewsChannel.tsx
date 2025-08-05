@@ -167,7 +167,19 @@ export default function NewsChannel() {
             {currentNews.title}
           </h2>
           <p className="text-gray-200 mb-2">
-            Published: {new Date(currentNews.pubDate).toLocaleString()}
+            Published:{" "}
+            {new Date(currentNews.pubDate).toLocaleDateString("en-US", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}{" "}
+            at{" "}
+            {new Date(currentNews.pubDate).toLocaleTimeString("en-US", {
+              hour: "numeric",
+              minute: "2-digit",
+              hour12: true,
+            })}
           </p>
           {(currentNews.creator || currentNews.imageCredit) && (
             <div className="flex items-center gap-4 mb-2 text-sm">
