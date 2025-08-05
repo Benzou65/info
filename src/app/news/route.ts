@@ -127,6 +127,10 @@ const reshapeFeed = (feed: CustomFeed) => {
   };
 };
 
+export const dynamic = "force-dynamic";
+
+export const revalidate = 1800; // 30 minutes
+
 export async function GET() {
   try {
     const feed = await parser.parseURL(
