@@ -11,6 +11,8 @@ interface CustomItem extends Parser.Item {
     };
   };
   imageCredit?: string;
+  creator?: string;
+  author?: string;
 }
 
 interface CustomFeed extends Parser.Output<CustomItem> {
@@ -22,6 +24,8 @@ const parser: Parser<CustomFeed> = new Parser({
     item: [
       ["media:content", "imageUrl"],
       ["media:credit", "imageCredit"],
+      ["dc:creator", "creator"],
+      ["author", "author"],
     ],
   },
 });
@@ -122,6 +126,8 @@ const reshapeFeed = (feed: CustomFeed) => {
           width: item.imageUrl?.$?.width ?? null,
           height: item.imageUrl?.$?.height ?? null,
         },
+        creator: item.creator || item.author || null,
+        imageCredit: item.imageCredit || null,
       }))
       .filter((item) => item.image.rssUrl !== null),
   };

@@ -7,6 +7,7 @@ interface NewsItem {
   title: string;
   link: string;
   pubDate: string;
+  creator?: string;
   image: {
     url: string;
     rssUrl: string;
@@ -14,6 +15,7 @@ interface NewsItem {
     width: number;
     height: number;
   };
+  imageCredit?: string;
 }
 
 // Custom Image component with fallback handling
@@ -167,6 +169,18 @@ export default function NewsChannel() {
           <p className="text-gray-200 mb-2">
             Published: {new Date(currentNews.pubDate).toLocaleString()}
           </p>
+          {(currentNews.creator || currentNews.imageCredit) && (
+            <div className="flex items-center gap-4 mb-2 text-sm">
+              {currentNews.creator && (
+                <span className="text-gray-300">By: {currentNews.creator}</span>
+              )}
+              {currentNews.imageCredit && (
+                <span className="text-gray-300">
+                  📷 {currentNews.imageCredit}
+                </span>
+              )}
+            </div>
+          )}
           <a
             href={currentNews.link}
             target="_blank"
